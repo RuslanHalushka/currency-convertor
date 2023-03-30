@@ -1,24 +1,24 @@
 import {useEffect, useState} from "react";
-import {getCurrService} from "../../services";
+import {useFetch} from "../../services";
 import {baseOfCurrencies} from "../index";
+import {url} from "../index";
 
 export const FilteredCurr =()=>{
-
     const [filteredCurrency, setFilteredCurrency] = useState();
-    useEffect(() => {
-        getCurrService.getCurr()
-            .then(value => value.data)
-            .then(value => value.filter(result =>{
-                if (baseOfCurrencies.find(value1 => value1 === result.cc)){
-                    return result
-                }
-            }))
-            .then(value => setFilteredCurrency(value))
-            .catch((err) => {
-                console.log(err);
-                alert('Дані не прийшли');
+    const {data, error} = useFetch(url);
+
+    if(error){
+        console.log(error)
+    }
+
+    useEffect(()=>{
+        if (data){
+            const filteredData = data.filter(result => {
+                return baseOfCurrencies.find(value1 => value1 === result.cc)
             })
-    }, []);
+            setFilteredCurrency(filteredData)
+        }
+    },[data])
 
     return filteredCurrency
 }
